@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-
+using Middlewares;
+using Microsoft.Extensions.Configuration;
 
 namespace Web.Api
 {
@@ -13,14 +14,14 @@ namespace Web.Api
     {
 
 
+        public Startup(IConfiguration configuration)
+        {
+            this.configuration = configuration;
+        }
+
+
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHsts(options =>
-            {
-                options.MaxAge = TimeSpan.FromDays(100);
-                options.IncludeSubDomains = true;
-                options.Preload = true;
-            });
         }
 
 
@@ -30,7 +31,8 @@ namespace Web.Api
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseHsts();
+
+            app.UseCustomHeaders(configuration.GetSection(CustomHeadersSettings.ConfigFileSectionName).Get<CustomHeadersSettings>());
 
             app.UseRouting();
 
@@ -42,6 +44,10 @@ namespace Web.Api
                 });
             });
         }
+
+
+        private readonly IConfiguration configuration;
+
     }
 
 }
