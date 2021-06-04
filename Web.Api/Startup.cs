@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using Middlewares;
 using Microsoft.Extensions.Configuration;
+using Web.Api.Settings;
 
 namespace Web.Api
 {
@@ -22,6 +23,18 @@ namespace Web.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var corsSettings = configuration.GetSection(CorsSettings.ConfigFileSectionName).Get<CorsSettings>();
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: CorsSettings.PolocyName, builder => {
+                    builder
+                    .WithOrigins(corsSettings.WhiteList.ToArray())
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+                    /*.SetIsOriginAllowed(origin => { return false; })*/;
+                });
+            });
         }
 
 
@@ -35,6 +48,8 @@ namespace Web.Api
             app.UseCustomHeaders(configuration.GetSection(CustomHeadersSettings.ConfigFileSectionName).Get<CustomHeadersSettings>());
 
             app.UseRouting();
+
+            app.UseCors(CorsSettings.PolocyName);
 
             app.UseEndpoints(endpoints =>
             {
