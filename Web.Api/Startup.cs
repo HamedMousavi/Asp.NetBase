@@ -3,17 +3,19 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 using Middlewares;
 using Microsoft.Extensions.Configuration;
 using Web.Api.Settings;
+using Web.Api.HealthChecks;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using HealthChecks.UI.Client;
+
 
 namespace Web.Api
 {
 
     public class Startup
     {
-
 
         public Startup(IConfiguration configuration)
         {
@@ -35,6 +37,8 @@ namespace Web.Api
                     /*.SetIsOriginAllowed(origin => { return false; })*/;
                 });
             });
+
+            services.AddHealthChecks().AddCheck(LoggerHealthCheck.Name, new LoggerHealthCheck(), LoggerHealthCheck.Severity, LoggerHealthCheck.Tags);
         }
 
 
@@ -57,6 +61,12 @@ namespace Web.Api
                 {
                     await context.Response.WriteAsync("Hello World!");
                 });
+            });
+
+            app.UseHealthChecks("/hc", new HealthCheckOptions
+            {
+                Predicate = _ => true,
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
             });
         }
 

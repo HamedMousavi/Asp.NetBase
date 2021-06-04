@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31321.278
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.Api", "Web.Api\Web.Api.csproj", "{ED889203-C6FB-43A4-AF3E-C20B290D68C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Api", "Web.Api\Web.Api.csproj", "{ED889203-C6FB-43A4-AF3E-C20B290D68C2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ben.Demystifier", "PrettyStackTrace\src\Ben.Demystifier\Ben.Demystifier.csproj", "{2033AFD6-92CD-48FA-AAE0-78C62D7ABC4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{ED889203-C6FB-43A4-AF3E-C20B290D68C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED889203-C6FB-43A4-AF3E-C20B290D68C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED889203-C6FB-43A4-AF3E-C20B290D68C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2033AFD6-92CD-48FA-AAE0-78C62D7ABC4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2033AFD6-92CD-48FA-AAE0-78C62D7ABC4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2033AFD6-92CD-48FA-AAE0-78C62D7ABC4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2033AFD6-92CD-48FA-AAE0-78C62D7ABC4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
