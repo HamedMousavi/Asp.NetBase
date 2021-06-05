@@ -1,24 +1,33 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Web.Api.Logging;
+
 
 namespace Web.Api.HealthChecks
 {
+
     public class LoggerHealthCheck : IHealthCheck
     {
+
         public static string Name => "Logger Health Check";
         public static IEnumerable<string> Tags => new string[] { Name };
         public static HealthStatus Severity => HealthStatus.Unhealthy;
+
+
+        public LoggerHealthCheck(ILogger logger)
+        {
+            this.logger = logger;
+        }
+
 
         public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             try
             {
-                //throw new InvalidOperationException("An exception produced at test time.");
+                logger.Trace("Checking logger health...");
             }
             catch (Exception exception)
             {
@@ -31,5 +40,8 @@ namespace Web.Api.HealthChecks
             }
             return Task.FromResult(HealthCheckResult.Healthy());
         }
+
+
+        private readonly ILogger logger;
     }
 }

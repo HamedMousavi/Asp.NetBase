@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
 using Web.Api.Logging;
@@ -12,22 +13,22 @@ namespace Web.Api
 
         public static int Main(string[] args)
         {
-            log = new SerilogLogger();
+            Logger = new SerilogLogger();
 
             try
             {
-                log.Trace("Starting web host");
+                Logger.Trace("Starting web host");
                 CreateHostBuilder(args).Build().Run();
                 return 0;
             }
             catch (Exception ex)
             {
-                log.Error(ex, "Host terminated unexpectedly");
+                Logger.Error(ex, "Host terminated unexpectedly");
                 return 1;
             }
             finally
             {
-                log.Dispose();
+                Logger.Dispose();
             }
         }
 
@@ -36,15 +37,18 @@ namespace Web.Api
         {
             return Host
                 .CreateDefaultBuilder(args)
-                .AddLogger(log)
+                .AddLogger(Logger)
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder
-                    .UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>();
                 });
         }
 
 
-        private static ILogger log;
+        internal static ILogger Logger;
     }
 }

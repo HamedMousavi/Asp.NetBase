@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Middlewares;
 using Microsoft.Extensions.Configuration;
-using Web.Api.Settings;
 using Web.Api.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using HealthChecks.UI.Client;
@@ -21,39 +20,32 @@ namespace Web.Api
         public Startup(IConfiguration configuration)
         {
             this.configuration = configuration;
+            //logger.Trace($"Config providers: {string.Join(", ", (configuration as IConfigurationRoot)?.Providers?.ToList())}");
         }
 
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var corsSettings = configuration.GetSection(CorsSettings.ConfigFileSectionName).Get<CorsSettings>();
-            services.AddCors(options =>
-            {
-                options.AddPolicy(name: CorsSettings.PolocyName, builder => {
-                    builder
-                    .WithOrigins(corsSettings.WhiteList.ToArray())
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials()
-                    /*.SetIsOriginAllowed(origin => { return false; })*/;
-                });
-            });
+            // Microsoft, is there really not a sane way of injecting Logger in Program and using it here?!!
+            var logger = Program.Logger; // todo: do something about this ugly piece of code. :-/
 
-            services.AddHealthChecks().AddCheck(LoggerHealthCheck.Name, new LoggerHealthCheck(), LoggerHealthCheck.Severity, LoggerHealthCheck.Tags);
+            services.Configure<CustomHeadersSettings>(configuration.GetSection(CustomHeadersSettings.ConfigFileSectionName));
+            services.Configure<CorsSettings>(configuration.GetSection(CorsSettings.ConfigFileSectionName));
+
+            services.AddCorsService();
+            services.AddHealthChecks().AddCheck(LoggerHealthCheck.Name, new LoggerHealthCheck(logger), LoggerHealthCheck.Severity, LoggerHealthCheck.Tags);
         }
+
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
-            app.UseCustomHeaders(configuration.GetSection(CustomHeadersSettings.ConfigFileSectionName).Get<CustomHeadersSettings>());
+            app.UseCustomHeaders();
 
             app.UseRouting();
 
-            app.UseCors(CorsSettings.PolocyName);
+            app.UseCorsService();
 
             app.UseEndpoints(endpoints =>
             {

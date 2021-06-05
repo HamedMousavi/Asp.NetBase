@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,18 +12,17 @@ namespace Middlewares
     public class CustomHeadersMiddleware
     {
 
-        public CustomHeadersMiddleware(RequestDelegate next, CustomHeadersSettings settings)
+        public CustomHeadersMiddleware(RequestDelegate next, IOptionsMonitor<CustomHeadersSettings> settings)
         {
             this.next = next ?? throw new ArgumentNullException(nameof(next));
-            this.settings = settings;
+            this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         }
 
 
         public async Task InvokeAsync(HttpContext context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-
-            context.Response.OnStarting(OnResponseStarting, Tuple.Create(context, settings));
+            context.Response.OnStarting(OnResponseStarting, Tuple.Create(context, settings.CurrentValue));
             await next(context);
         }
 
@@ -41,20 +41,19 @@ namespace Middlewares
 
 
         private readonly RequestDelegate next;
-        private readonly CustomHeadersSettings settings;
+        private readonly IOptionsMonitor<CustomHeadersSettings> settings;
     }
 
 
     public static class CustomHeadersExtensions
     {
-        public static IApplicationBuilder UseCustomHeaders(this IApplicationBuilder app, CustomHeadersSettings headers)
+        public static IApplicationBuilder UseCustomHeaders(this IApplicationBuilder app)
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
-            if (headers == null) throw new ArgumentNullException(nameof(headers));
-
-            return app.UseMiddleware<CustomHeadersMiddleware>(headers);
+            return app.UseMiddleware<CustomHeadersMiddleware>();
         }
     }
+
 
     public class CustomHeadersSettings : Dictionary<string, string>
     {
