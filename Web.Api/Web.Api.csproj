@@ -22,8 +22,4 @@
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\PrettyStackTrace\src\Ben.Demystifier\Ben.Demystifier.csproj" />
-  </ItemGroup>
-
 </Project>
