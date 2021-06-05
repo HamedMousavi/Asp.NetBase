@@ -1,0 +1,26 @@
+﻿{
+  "Serilog": {
+    "Using": [ "Serilog", "Serilog.Enrichers.Environment", "Serilog.Enrichers.Process", "Serilog.Enrichers.Thread", "Serilog.Enrichers.AssemblyName", "Serilog.Sinks.Http", "Serilog.Sinks.Console", "Serilog.Sinks.Debug", "Serilog.Sinks.Trace" ],
+    "MinimumLevel": "Debug",
+    "WriteTo": [
+      {
+        "Name": "DurableHttpUsingFileSizeRolledBuffers",
+        "Args": {
+          "requestUri": "http://logserver/log-web-api-",
+          "textFormatter": "Serilog.Sinks.Http.TextFormatters.NormalTextFormatter, Serilog.Sinks.Http, Version=7.2.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10",
+          "bufferBaseFileName": "logs\\web.api.json",
+          "batchPostingLimit": 1,
+          "period": "00:00:00.0010"
+        }
+      },
+      {
+        "Name": "Console",
+        "Args": { "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] MachineName:[{MachineName}] ProcessName:[{ProcessName}] ThreadId[{ThreadId}] Application:[{Application}] {Message:lj}{NewLine}{Exception}" }
+      }
+    ],
+    "Enrich": [ "WithMachineName", "WithProcessName", "WithThreadId", "WithAssemblyName", "WithExceptionDetails", "WithClientIp" ],
+    "Properties": {
+      "Application": "Web.Api"
+    }
+  }
+}

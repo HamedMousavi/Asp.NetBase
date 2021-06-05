@@ -9,6 +9,7 @@ using Web.Api.Settings;
 using Web.Api.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using HealthChecks.UI.Client;
+using Web.Api.Logging;
 
 
 namespace Web.Api
@@ -41,7 +42,6 @@ namespace Web.Api
             services.AddHealthChecks().AddCheck(LoggerHealthCheck.Name, new LoggerHealthCheck(), LoggerHealthCheck.Severity, LoggerHealthCheck.Tags);
         }
 
-
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -59,6 +59,8 @@ namespace Web.Api
             {
                 endpoints.MapGet("/", async context =>
                 {
+                    var logger = context.RequestServices.GetService<ILogger>();
+                    logger.Trace("Hello World!");
                     await context.Response.WriteAsync("Hello World!");
                 });
             });
@@ -72,7 +74,6 @@ namespace Web.Api
 
 
         private readonly IConfiguration configuration;
-
     }
 
 }

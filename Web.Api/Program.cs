@@ -1,26 +1,50 @@
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Web.Api.Logging;
+
 
 namespace Web.Api
 {
+
     public class Program
     {
-        public static void Main(string[] args)
+
+        public static int Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            log = new SerilogLogger();
+
+            try
+            {
+                log.Trace("Starting web host");
+                CreateHostBuilder(args).Build().Run();
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, "Host terminated unexpectedly");
+                return 1;
+            }
+            finally
+            {
+                log.Dispose();
+            }
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host
+                .CreateDefaultBuilder(args)
+                .AddLogger(log)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder
+                    .UseStartup<Startup>();
                 });
+        }
+
+
+        private static ILogger log;
     }
 }
