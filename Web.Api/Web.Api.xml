@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Web.Api</name>
+    </assembly>
+    <members>
+        <member name="M:Web.Api.Controllers.HomeController.Get(System.Int32)">
+            <summary>
+            Get some values
+            </summary>
+            <returns>available values</returns>
+            <remarks>
+            <param name="id"></param>
+            Here's some description of this **cool** api \
+            The api description can consist of multiple lines \
+            Cute, isn't it?!
+            [
+                {
+                    // Summary does not support markdown!! but it is supported for the remarks, Params, response tag.
+                }
+            ]
+            </remarks>
+            <response code="200">returns a value</response>
+            <response code="400">Bad request, returns nothing</response>
+            <response code="404">Not Found, returns nothing</response>
+            <response code="406">Not Allowed, returns nothing</response>
+            <response code="500">Error, returns nothing</response>
+        </member>
+    </members>
+</doc>

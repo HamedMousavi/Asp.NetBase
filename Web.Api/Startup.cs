@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Middlewares;
@@ -8,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Web.Api.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using HealthChecks.UI.Client;
-using Web.Api.Logging;
+using Web.Api.Middlewares;
 
 
 namespace Web.Api
@@ -20,7 +19,6 @@ namespace Web.Api
         public Startup(IConfiguration configuration)
         {
             this.configuration = configuration;
-            //logger.Trace($"Config providers: {string.Join(", ", (configuration as IConfigurationRoot)?.Providers?.ToList())}");
         }
 
 
@@ -28,12 +26,23 @@ namespace Web.Api
         {
             // Microsoft, is there really not a sane way of injecting Logger in Program and using it here?!!
             var logger = Program.Logger; // todo: do something about this ugly piece of code. :-/
+            //logger.Trace($"Config providers: {string.Join(", ", (configuration as IConfigurationRoot)?.Providers?.ToList())}");
 
             services.Configure<CustomHeadersSettings>(configuration.GetSection(CustomHeadersSettings.ConfigFileSectionName));
             services.Configure<CorsSettings>(configuration.GetSection(CorsSettings.ConfigFileSectionName));
 
             services.AddCorsService();
             services.AddHealthChecks().AddCheck(LoggerHealthCheck.Name, new LoggerHealthCheck(logger), LoggerHealthCheck.Severity, LoggerHealthCheck.Tags);
+
+            services.AddControllers(o =>
+            {
+                o.OutputFormatters.Clear();
+                o.OutputFormatters.Add(new Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter(new System.Text.Json.JsonSerializerOptions { }));
+                o.OutputFormatters.Add(new Microsoft.AspNetCore.Mvc.Formatters.XmlSerializerOutputFormatter());
+                o.ReturnHttpNotAcceptable = true;
+            });
+
+            services.AddOpenApi();
         }
 
 
@@ -49,12 +58,7 @@ namespace Web.Api
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    var logger = context.RequestServices.GetService<ILogger>();
-                    logger.Trace("Hello World!");
-                    await context.Response.WriteAsync("Hello World!");
-                });
+                endpoints.MapControllers();
             });
 
             app.UseHealthChecks("/hc", new HealthCheckOptions
@@ -62,6 +66,8 @@ namespace Web.Api
                 Predicate = _ => true,
                 ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
             });
+
+            app.UseOpenApi();
         }
 
 
