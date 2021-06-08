@@ -7,7 +7,7 @@ using Web.Api.Logging;
 namespace Web.Api.Controllers
 {
 
-    [Route("api/[controller]")]
+    [Route("api/[controller]/{id}")]
     [ApiController]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
